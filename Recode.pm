@@ -5,7 +5,7 @@ package Convert::Recode;
 use strict;
 
 use vars qw($VERSION $DEBUG);
-$VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
+$VERSION = "1.04";
 
 use Carp qw(croak);
 use File::Spec;
@@ -100,11 +100,14 @@ strict_mac_to_latin1() function converts a string to latin1 and
 removes all mac characters that do not have a corresponding latin1
 character.
 
-Running the command C<recode -l> should give you the list of available character
-sets.
+Running the command C<recode -l> should give you the list of available
+character sets.
 
-=head1 AUTHOR
+=head1 COPYRIGHT
 
-Copyright © 1997,2003 Gisle Aas.
+© 1997,2003 Gisle Aas.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
 =cut

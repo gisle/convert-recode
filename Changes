@@ -1,6 +1,6 @@
 2003-12-18  Gisle Aas <gisle@ActiveState.com>
 
-   Release 1.05
+   Release 1.04
 
    Make it work with modern versions of recode.  Needs recode v3.5
    or better now.
