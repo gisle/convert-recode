@@ -85,23 +85,23 @@ Convert::Recode - make mapping functions between character sets
 
 The Convert::Recode module can provide mapping functions between
 character sets on demand.  It depends on GNU recode to provide the raw
-mapping data, i.e. GNU recode must be installed first.  The names of
-the mapping functions are found by taking the name of the two charsets
-and then joining them with the string "_to_".  If you want to convert
-between the "mac" and the "latin1" charsets, then you just import the
+mapping data, i.e. GNU recode must be installed first.  The name of
+the mapping function is constructed by taking the names of the two charsets
+and joining them with the string "_to_".  For example, if you want to convert
+between the "mac" and the "latin1" charsets, just import the
 mac_to_latin1() function.
 
-If you prefix the function name with "strict_" then characters that
-can not be mapped are removed during transformation.  For instance the
-strict_mac_to_latin1() function will convert to a string to latin1 and
-remove all mac characters that have not corresponding latin1
+If you prefix the function name with "strict_", any characters that
+cannot be mapped are removed during transformation.  For instance, the
+strict_mac_to_latin1() function converts a string to latin1 and
+removes all mac characters that do not have a corresponding latin1
 character.
 
-Running the command C<recode -l> should give you the list of character
-sets available.
+Running the command C<recode -l> should give you the list of available character
+sets.
 
 =head1 AUTHOR
 
-© 1997 Gisle Aas.
+Copyright © 1997 Gisle Aas.
 
 =cut
