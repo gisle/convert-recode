@@ -2,11 +2,14 @@ package Convert::Recode;
 
 # $Id$
 
-use Carp;
 use strict;
 
 use vars qw($VERSION $DEBUG);
 $VERSION = sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
+
+use Carp qw(croak);
+use File::Spec;
+my $devnull = File::Spec->devnull;
 
 
 sub import
@@ -21,7 +24,7 @@ sub import
 	}
 	local(*RECODE, $_);
 	my $strict = $1 ? "s" : "";  # strict mode flag
-	open(RECODE, "recode -${strict}h $2:$3 2>/dev/null|") or die;
+	open(RECODE, "recode -${strict}h $2..$3 2>$devnull|") or die;
 	my @codes;
 	while (<RECODE>) {
 	    push(@codes, /(\d+|\"[^\"]*\"),/g);
@@ -102,6 +105,6 @@ sets.
 
 =head1 AUTHOR
 
-Copyright © 1997 Gisle Aas.
+Copyright © 1997,2003 Gisle Aas.
 
 =cut
