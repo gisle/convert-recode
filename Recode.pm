@@ -14,7 +14,7 @@ sub import
 
     my $subname;
     for $subname (@_) {
-	unless ($subname =~ /^(\w+)_to_(\w+)/) {
+	unless ($subname =~ /^(\w+)_to_(\w+)$/) {
 	    croak("recode routine name must be on the form: xxx_to_yyy");
 	}
 	local(*RECODE, $_);
@@ -27,7 +27,7 @@ sub import
 	die "Can't recode $subname, 'recode -l' for available charsets\n"
 	  unless @codes == 256;
 
-	my $impl = 'sub { my $tmp = shift; $tmp =~ tr/\x00-\xFF/' .
+	my $impl = 'sub ($) { my $tmp = shift; $tmp =~ tr/\x00-\xFF/' .
 	           join("", map sprintf("\\x%02X", $_), @codes) .
 	           '/; $tmp }';
 	print $impl if $DEBUG;
