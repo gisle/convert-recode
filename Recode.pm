@@ -1,5 +1,7 @@
 package Convert::Recode;
 
+# $Id$
+
 use Carp;
 use strict;
 
@@ -14,24 +16,49 @@ sub import
 
     my $subname;
     for $subname (@_) {
-	unless ($subname =~ /^(\w+)_to_(\w+)$/) {
+	unless ($subname =~ /^(strict_)?(\w+)_to_(\w+)$/) {
 	    croak("recode routine name must be on the form: xxx_to_yyy");
 	}
 	local(*RECODE, $_);
-	open(RECODE, "recode -h $1:$2 2>/dev/null|") or die;
+	my $strict = $1 ? "s" : "";  # strict mode flag
+	open(RECODE, "recode -${strict}h $2:$3 2>/dev/null|") or die;
 	my @codes;
 	while (<RECODE>) {
-	    push(@codes, /(\d+),/g);
+	    push(@codes, /(\d+|\"[^\"]*\"),/g);
 	}
 	close(RECODE);
 	die "Can't recode $subname, 'recode -l' for available charsets\n"
 	  unless @codes == 256;
 
-	my $impl = 'sub ($) { my $tmp = shift; $tmp =~ tr/\x00-\xFF/' .
-	           join("", map sprintf("\\x%02X", $_), @codes) .
-	           '/; $tmp }';
-	print $impl if $DEBUG;
-	my $sub = eval $impl;
+	my $code;
+	if ($strict) {
+	    my $c = 0;
+	    my $from = "";  # all chars (matching $to$del)
+	    my $to   = "";  # transformation
+	    my $del  = "";  # no tranformation available (to be deleted)
+	    for (@codes) {
+		my $o = sprintf("\\%03o", $c);
+		if ($_ eq "0" || $_ eq '""') {
+		    $del .= $o;
+		    next;
+		}
+		$from .= $o;
+		s/^\"//; s/\"$//;
+		$to   .= $_;
+	    } continue {
+		$c++;
+	    }
+	    $to =~ s,/,\\/,;
+	    $code = 'sub ($){ my $tmp = shift; $tmp =~ ' .
+                    "tr/$from$del/$to/d; \$tmp }";
+	} else {
+	    $code = 'sub ($) { my $tmp = shift; $tmp =~ tr/\x00-\xFF/' .
+	            join("", map sprintf("\\x%02X", $_), @codes) .
+	            '/; $tmp }';
+	}
+
+	print STDERR $code if $DEBUG;
+	my $sub = eval $code;
 	die if $@;
 	no strict 'refs';
 	*{$pkg . "::" . $subname} = $sub;
@@ -63,6 +90,12 @@ the mapping functions are found by taking the name of the two charsets
 and then joining them with the string "_to_".  If you want to convert
 between the "mac" and the "latin1" charsets, then you just import the
 mac_to_latin1() function.
+
+If you prefix the function name with "strict_" then characters that
+can not be mapped are removed during transformation.  For instance the
+strict_mac_to_latin1() function will convert to a string to latin1 and
+remove all mac characters that have not corresponding latin1
+character.
 
 Running the command C<recode -l> should give you the list of character
 sets available.
