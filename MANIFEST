@@ -3,4 +3,4 @@ MANIFEST
 Makefile.PL
 README
 Recode.pm
-test.pl
+t/recode.t
